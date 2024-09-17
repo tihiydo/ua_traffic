@@ -1,0 +1,1 @@
+export const POST_TIME_INTERVAL = 1000 * 60 * 30; 

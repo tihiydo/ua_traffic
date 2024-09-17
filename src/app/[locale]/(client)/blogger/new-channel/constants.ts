@@ -1,0 +1,1 @@
+export const MIN_ABOUT_LENGTH = 30;

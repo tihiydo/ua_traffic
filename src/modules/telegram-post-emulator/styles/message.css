@@ -1,0 +1,7 @@
+.tg-message a {
+  color: #4a81b7 !important;
+}
+
+.tg-message a:hover {
+  text-decoration: underline;
+}

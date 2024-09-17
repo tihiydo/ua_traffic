@@ -1,0 +1,7 @@
+User-Agent: *
+Disallow: /admin/
+Disallow: /moder/
+Disallow: /admin-login
+Disallow: /login 
+Disallow: /forgot-password
+Disallow: /sign-up

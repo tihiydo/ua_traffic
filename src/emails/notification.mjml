@@ -1,0 +1,35 @@
+<mjml>
+  <mj-head>
+    <!-- Fonts -->
+    <mj-font name="Kankin" href="https://fonts.cdnfonts.com/css/kankin"></mj-font>
+    <mj-font name="Montserrat" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700"></mj-font>
+    <mj-font name="Unbounded" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900"></mj-font>
+    
+    <mj-style>
+      .notification-link-button:hover td,
+      .notification-link-button:hover a {
+        background-color: #ffe67d !important
+      }
+
+      .notification-link-button td,
+      .notification-link-button a {
+        transition-duration: 150ms
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-section background-color="#fff">
+      <mj-column>
+        <mj-text font-size="48px" font-family="Kankin" font-weight="500">UATRAFFIC</mj-text>
+
+        <mj-text font-size="24px" padding-top="40px" font-family="Unbounded" font-weight="700" color="#323232">Кабінет блогера</mj-text>
+
+        <mj-text css-class="notification-content" font-size="16px" font-family="Montserrat" color="#323232" align="left" line-height="140%">lorem ipsum dolor sit amet kjasdkgj asgkasjdgkjaskd asdgjasjv ascask djasdjg asdg asdasdgjk asjdgasdgasdkgja sdglajksdglkajsdg kjaksjdgkajs dkaskdjg dgk jsdgj aksdj gaksdjg aksdjg kasjdgkajsd gkjasijtio132jtgipasjfd ngaklsjdg asjdg 0-afbsfopbjas</mj-text>
+
+        <mj-button css-class="notification-link-button" align="left" font-size="16px" font-family="Montserrat" font-weight="500" background-color="#FFDE59" color="#323232" href="#">
+          Дивитися
+        </mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

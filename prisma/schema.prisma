@@ -1,0 +1,547 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("PRODUCTION_POSTGRES_PRISMA_URL")
+  directUrl = env("PRODUCTION_POSTGRES_URL_NON_POOLING")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model warningMessages {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  chatId    String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                                 String                             @id @default(cuid())
+  name                               String?
+  email                              String?                            @unique
+  tel                                String?                            @unique
+  telegram                           String?
+  password                           String?
+  emailVerified                      DateTime?
+  image                              String?
+  banned                             Boolean                            @default(false)
+  twofaGoogle                        String?
+  twofaGoogleForGoogleUsersIsChecked Boolean                            @default(false)
+  preferedLocale                     String                             @default("ua")
+  advertiserBalance                  Int                                @default(0)
+  advertiserHoldBalance              Int                                @default(0)
+  bloggerBalance                     Int                                @default(0)
+  bloggerHoldBalance                 Int                                @default(0)
+  bloggerCabinetColor                String?                            @default("#FFDD5F")
+  advertiserCabinetColor             String?                            @default("#69C5DE")
+  profileCabinetColor                String?                            @default("#FFDD5F")
+  toWithdraw                         Int                                @default(0)
+  totalWithdrawed                    Int                                @default(0)
+  userRowCreatedAt                   DateTime                           @default(now())
+  selectedCabinet                    Cabinet                            @default(Advertiser)
+  accounts                           Account[]
+  AdvertismentPost                   AdvertismentPost[]
+  bloggers                           Blogger[]
+  DepositTransaction                 DepositTransaction[]
+  guestUser                          Referrals?                         @relation("GuestUser")
+  inviterUser                        Referrals[]                        @relation("InviterUser")
+  Requisites                         Requisites[]
+  SavedBloggers                      SavedBloggers[]
+  TelegramVerificationNotifyRequest  TelegramVerificationNotifyRequest?
+  telegramVerificationRequest        TelegramVerificationRequests?
+  WithdrawTransaction                WithdrawTransaction[]
+  todos                              Todo[]
+  todoSections                       TodoSection[]
+  reviewsGiven                       BloggerReview[]
+  TransferTransaction                TransferTransaction[]
+
+  warningMessages warningMessages[]
+  Chat Chat[] @relation("ChatParticipants")
+  Message Message[]
+}
+
+model TransferTransaction {
+  id             String   @id @default(cuid())
+  amount         Int
+  fromAccount    String
+  toAccount      String
+  amountAfterFee Int?
+  userId         String
+  createdAt      DateTime @default(now())
+  User           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TodoSection {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  todos     Todo[]
+}
+
+model Todo {
+  id        String       @id @default(cuid())
+  text      String
+  completed Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  userId    String
+  sectionId String?
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  section   TodoSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+}
+
+model Referrals {
+  guestUserId      String   @unique
+  guestInvitedDate DateTime
+  guestEmail       String?
+  inviterUserId    String
+  guestUser        User     @relation("GuestUser", fields: [guestUserId], references: [id], onDelete: Cascade)
+  inviterUser      User     @relation("InviterUser", fields: [inviterUserId], references: [id])
+}
+
+model CategoriesTEMP {
+  id   String @id @default(cuid())
+  categories BloggerCategory[]
+}
+
+model Blogger {
+  id                  String                @unique
+  username            String
+  profileLink         String?
+  followersCount      Int
+  womenPercentage     Float?
+  menPercentage       Float?
+  ageCategory         String?
+  cpm                 Float?
+  cpv                 Float?
+  channelAge          Int?
+  profilePicture      String
+  about               String
+  type                SocialType
+  coverage            Int?
+  status              BloggerStatus
+  fake                Boolean               @default(false)
+  declinedMessage     String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
+  acceptedAt          DateTime?
+  userId              String
+  tags                BloggerTag[]
+  prices              Json
+  categories          Json
+  statistic           Json                  @default("{}")
+  AdvertismentRequest AdvertismentRequest[]
+  User                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SavedBloggers       SavedBloggers[]
+  reviews             BloggerReview[]
+  rating              Int                   @default(500)
+}
+
+model BloggerReview {
+  id              String              @id @default(cuid())
+  bloggerId       String
+  advertiserId    String
+  requestId       String              @unique
+  professionalism Int?
+  quality         Int?
+  price           Int?
+  communication   Int?
+  text            String
+  status          ReviewStatus        @default(Pending)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  blogger         Blogger             @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  advertiser      User                @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  request         AdvertismentRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+enum ReviewStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+model AdvertismentPost {
+  id                  String                 @id @default(cuid())
+  title               String
+  content             String
+  social              SocialType
+  status              AdvertismentPostStatus @default(Moderating)
+  attachments         Json?
+  creatorId           String
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @default(now()) @updatedAt
+  initialType         String?
+  preview             Json?
+  Creator             User                   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  AdvertismentRequest AdvertismentRequest[]
+}
+
+model AdvertismentRequest {
+  id                   String                    @id @default(cuid())
+  advertismentPostId   String
+  dateFrom             DateTime
+  dateTo               DateTime
+  exactDate            DateTime?
+  price                Int
+  discount             Json?
+  status               AdvertismentRequestStatus @default(New)
+  bloggerId            String
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @default(now()) @updatedAt
+  acceptedAt           DateTime?
+  type                 String                    @default("story")
+  AdRequestTransaction AdRequestTransaction?
+  AdvertismentPost     AdvertismentPost          @relation(fields: [advertismentPostId], references: [id], onDelete: Cascade)
+  Blogger              Blogger                   @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  Chat                 Chat?
+  review               BloggerReview?
+}
+
+model DepositTransaction {
+  id                    String                   @id @default(cuid())
+  status                DepositTransactionStatus @default(Processing)
+  amount                Int
+  realAmount            Int
+  paymentUrl            String?
+  paymentSystemResponse Json?
+  invoiceId             String?
+  userId                String
+  createdAt             DateTime                 @default(now())
+  User                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model adminFee {
+  fee  Float
+  type FeeType @id
+}
+
+model WithdrawTransaction {
+  id         String                    @id @default(cuid())
+  amount     Int
+  realAmount Int
+  cardNumber String
+  fio        String
+  cardBank   CardBank
+  status     WithdrawTransactionStatus @default(Processing)
+  userId     String
+  createdAt  DateTime                  @default(now())
+  User       User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Requisites {
+  id         String   @id @default(cuid())
+  fio        String
+  cardBank   CardBank
+  cardNumber String   @unique
+  userId     String
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordChangeToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model IGAccessToken {
+  profileId String   @unique
+  token     String   @unique
+  expires   DateTime
+}
+
+model TelegramVerificationRequests {
+  userId                 String   @unique
+  cryptedStartKey        String   @unique
+  createdAt              DateTime
+  userTelegramId         String?  @unique
+  channelType            String?
+  title                  String?
+  username               String?
+  channelMembers         Int?
+  coverageCount          Int?
+  profilePhotoTelegramId String?
+  verifiedChannelId      String?
+  User                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chat {
+  id                    String                @id @default(cuid())
+  advertismentRequestId String?               @unique
+  isAdminChat           Boolean               @default(false)
+  title                 String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @default(now()) @updatedAt
+  AdvertismentRequest   AdvertismentRequest?  @relation(fields: [advertismentRequestId], references: [id], onDelete: Cascade)
+  messages              Message[]
+  participants          User[]                @relation("ChatParticipants")
+
+  warningMessages warningMessages[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  chatId    String
+  senderId  String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model IGCookie {
+  id          String         @id @default(cuid())
+  name        String
+  username    String
+  value       String
+  status      IGCookieStatus @default(Paused)
+  lastUsed    DateTime?
+  lastBrokeAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now()) @updatedAt
+}
+
+model Notifications {
+  id               String           @id @default(cuid())
+  recipients       Json
+  viewedBy         Json             @default("[]")
+  text             String
+  notificationType NotificationType @default(Other)
+  additionalHref   String?
+  createdAt        DateTime         @default(now())
+}
+
+model SavedBloggers {
+  id        String   @id @default(cuid())
+  saveddAt  DateTime @default(now())
+  bloggerId String
+  userId    String
+  Blogger   Blogger  @relation(fields: [bloggerId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TelegramVerificationNotifyRequest {
+  userId   String @unique
+  startKey String @unique
+  User     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdRequestTransaction {
+  id        String                     @id @default(cuid())
+  amount    Int
+  status    AdRequestTransactionStatus @default(Hold)
+  requestId String                     @unique
+  createdAt DateTime                   @default(now())
+  Request   AdvertismentRequest        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+}
+
+model ArticleRating {
+  id          Int         @id @default(autoincrement())
+  articleId   String
+  rating      Int
+  BlogArticle BlogArticle @relation(fields: [articleId], references: [id])
+}
+
+model BlogArticle {
+  id            String               @id @default(cuid())
+  slug          String               @unique
+  title         String
+  description   String
+  image         String
+  createdAt     DateTime             @default(now())
+  descriptionEn String?
+  descriptionRu String?
+  titleEn       String?
+  titleRu       String?
+  isArchived    Boolean              @default(false)
+  ratings       ArticleRating[]
+  Sections      BlogArticleSection[]
+}
+
+model BlogArticleSection {
+  id        String      @id @default(cuid())
+  type      SectionType
+  title     String?
+  content   String?
+  image     String?
+  articleId String
+  contentEn String?
+  contentRu String?
+  titleEn   String?
+  titleRu   String?
+  Article   BlogArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+enum BloggerStatus {
+  Moderating
+  Declined
+  Inactive
+  Active
+}
+
+enum AdvertismentRequestStatus {
+  New
+  Done
+  Accepted
+  Declined
+  Moderating
+}
+
+enum DepositTransactionStatus {
+  Processing
+  Done
+  Declined
+  Expired
+}
+
+enum FeeType {
+  Widthdraw
+  Deposit
+  Bonus
+  Transfer
+}
+
+enum WithdrawTransactionStatus {
+  Processing
+  Done
+}
+
+enum AdvertismentPostStatus {
+  Moderating
+  Accepted
+  Declined
+}
+
+enum SocialType {
+  Instagram
+  Telegram
+}
+
+enum BloggerCategory {
+  News
+  sport
+  cryptocurrency
+  Gaming
+  It
+  unknown
+  darknet
+  authors
+  auto
+  moto
+  culinary
+  business_and_startups
+  marketing
+  music
+  creativity
+  travel
+  tourism
+  economics
+  booking_and_betting
+  casino
+  finance_and_investments
+  blog
+  entertainment
+  humor
+  sexology
+  astrology_and_horoscope
+  numerology_and_karma
+  memes
+  topics
+  artificial_intelligence
+  womens
+  beauty
+  cosmetics
+  self_care
+  healthy_eating
+  fashion
+  interior
+  real_estate
+  construction
+  lifehacks
+  books
+  movies_and_cartoons
+  history
+  mathematics
+  politics
+  education
+  mens
+  eighteenth_plus
+}
+
+
+enum BloggerTag {
+  New
+  Trusted
+}
+
+enum Cabinet {
+  Advertiser
+  Blogger
+}
+
+enum IGCookieStatus {
+  Active
+  Broken
+  Paused
+}
+
+enum NotificationType {
+  Other
+  Blogger
+  Advertiser
+  System
+}
+
+enum CardBank {
+  Mastercard
+  Other
+}
+
+enum AdRequestTransactionStatus {
+  Hold
+  Cancelled
+  Done
+}
+
+enum BalanceType {
+  Hold
+  Balance
+}
+
+enum SectionType {
+  TITLE
+  TEXT
+  IMAGE
+}

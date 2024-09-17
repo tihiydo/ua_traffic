@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.customswn
+{
+    position: absolute !important;
+    bottom: auto !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    right: auto !important;
+    left: 50% !important;
+    bottom: 5px !important;
+    transform: translateX(-50%) !important;
+    padding-left: 50px !important;
+    color: black;
+}
+
+.customswn::after
+{
+    font-size: 15px !important;
+}
+
+.customswl
+{
+    position: absolute !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    left: 50% !important;
+    bottom: 5px !important;
+    transform: translateX(-50%) !important;
+    padding-right: 50px !important;
+    color: black;
+}
+
+.customswl::after
+{
+    font-size: 15px !important;
+}
+
+.swiper-wrapper .swiper-slide {
+    height: unset;
+}
+.swiper-wrapper {
+    align-items: stretch;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.react-flow__attribution {
+    display: none !important;
+}
+
+:root {
+    scroll-behavior: smooth;
+}
+
+.border-l {
+    border-left-width: 1px;
+}
+
+.border-t {
+    border-top-width: 1px;
+}
+
+.border-gray-300 {
+    border-color: #d1d5db;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.pl-4 {
+    padding-left: 1rem;
+}
+
+
+/* .group-hover .transform {
+    transition: transform 0.3s ease-in-out;
+}
+
+.transition-transform {
+    transition: transform 0.3s ease-in-out;
+}
+
+.transform:hover {
+    transform: scale(1.05);
+} */
+
+/* input[type="text"] {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #a0aec0;
+    box-shadow: 0 0 0 2px rgba(160, 174, 192, 0.25);
+} */
+
+.border-spacing {
+    margin-bottom: 20px;
+    /* Adjust the spacing as needed */
+}
+
+.flex.flex-wrap {
+    gap: 1rem;
+}

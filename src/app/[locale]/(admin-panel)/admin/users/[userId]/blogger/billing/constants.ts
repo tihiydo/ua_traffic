@@ -1,0 +1,1 @@
+export const MIN_WITHDRAW_AMOUNT = 200;
